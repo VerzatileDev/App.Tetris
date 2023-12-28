@@ -6,24 +6,29 @@ const int N = 10;
 
 int field[M][N] = { 0 };
 
-struct Point { int x, y; } a[4], b[4];
+struct Point
+{
+    int x, y;
+} a[4], b[4];
 
 int figures[7][4] =
 {
-    1,3,5,7, // I
-    2,4,5,7, // Z
-    3,5,4,6, // S
-    3,5,4,7, // T
-    2,3,5,7, // L
-    3,5,7,6, // J
-    2,3,4,5, // O
+    1, 3, 5, 7, // I
+    2, 4, 5, 7, // Z
+    3, 5, 4, 6, // S
+    3, 5, 4, 7, // T
+    2, 3, 5, 7, // L
+    3, 5, 7, 6, // J
+    2, 3, 4, 5, // O
 };
 
 bool check()
 {
     for (int i = 0; i < 4; i++)
-        if (a[i].x < 0 || a[i].x >= N || a[i].y >= M) return false;
-        else if (field[a[i].y][a[i].x]) return false;
+        if (a[i].x < 0 || a[i].x >= N || a[i].y >= M)
+            return false;
+        else if (field[a[i].y][a[i].x])
+            return false;
 
     return true;
 }
@@ -34,8 +39,24 @@ int main()
 
     sf::RenderWindow window(sf::VideoMode(320, 480), "Tetris");
 
+    // Calculate initial spawn position based on window size
+    int spawnX = N / 2;
+    int spawnY = 0;
+
+    int windowWidth = window.getSize().x;
+    int windowHeight = window.getSize().y;
+
+    // Center the game field on the window
+    int offsetX = (windowWidth - N * 18) / 2;
+    int offsetY = (windowHeight - M * 18) / 2;
+
+    // Center the field image on the window
+    int fieldOffsetX = (windowWidth - N * 18) / 2;
+    int fieldOffsetY = (windowHeight - M * 18) / 2;
+
     sf::Texture t, t2;
-    if (!t.loadFromFile("Textures/tiles.png") || !t2.loadFromFile("Textures/frame.png")) {
+    if (!t.loadFromFile("Textures/tiles.png") || !t2.loadFromFile("Textures/frame.png"))
+    {
         // Error loading textures
         return -1;
     }
@@ -49,15 +70,10 @@ int main()
 
     sf::Clock clock;
 
-    // Initial spawn position from the middle top
-    int spawnX = N / 2;
-    int spawnY = 0;
-
-    int n = rand() % 7; // Randomize figure index
     for (int i = 0; i < 4; i++)
     {
-        a[i].x = figures[n][i] % 2 + spawnX;
-        a[i].y = figures[n][i] / 2 + spawnY;
+        a[i].x = figures[0][i] % 2 + spawnX;
+        a[i].y = figures[0][i] / 2 + spawnY;
     }
 
     while (window.isOpen())
@@ -73,14 +89,19 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
-                if (event.key.code == sf::Keyboard::Up) rotate = true;
-                else if (event.key.code == sf::Keyboard::Left) dx = -1;
-                else if (event.key.code == sf::Keyboard::Right) dx = 1;
+                if (event.key.code == sf::Keyboard::Up)
+                    rotate = true;
+                else if (event.key.code == sf::Keyboard::Left)
+                    dx = -1;
+                else if (event.key.code == sf::Keyboard::Right)
+                    dx = 1;
             }
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) delay = 0.05;
-        else delay = 0.3;  // Reset delay if Down key is released
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            delay = 0.05;
+        else
+            delay = 0.3; // Reset delay if Down key is released
 
         // <- Move -> //
         for (int i = 0; i < 4; i++)
@@ -88,12 +109,14 @@ int main()
             b[i] = a[i];
             a[i].x += dx;
         }
-        if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
+        if (!check())
+            for (int i = 0; i < 4; i++)
+                a[i] = b[i];
 
         // Rotate //
         if (rotate)
         {
-            Point p = a[1]; //center of rotation
+            Point p = a[1]; // center of rotation
             for (int i = 0; i < 4; i++)
             {
                 int x = a[i].y - p.y;
@@ -101,7 +124,9 @@ int main()
                 a[i].x = p.x - x;
                 a[i].y = p.y + y;
             }
-            if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
+            if (!check())
+                for (int i = 0; i < 4; i++)
+                    a[i] = b[i];
         }
 
         // Tick //
@@ -114,10 +139,11 @@ int main()
             }
             if (!check())
             {
-                for (int i = 0; i < 4; i++) field[b[i].y][b[i].x] = colorNum;
+                for (int i = 0; i < 4; i++)
+                    field[b[i].y][b[i].x] = colorNum;
 
                 colorNum = 1 + rand() % 7;
-                n = rand() % 7;
+                int n = rand() % 7;
                 for (int i = 0; i < 4; i++)
                 {
                     a[i].x = figures[n][i] % 2 + spawnX;
@@ -134,31 +160,37 @@ int main()
             int count = 0;
             for (int j = 0; j < N; j++)
             {
-                if (field[i][j]) count++;
+                if (field[i][j])
+                    count++;
                 field[k][j] = field[i][j];
             }
-            if (count < N) k--;
+            if (count < N)
+                k--;
         }
 
-        dx = 0; rotate = false;
+        dx = 0;
+        rotate = false;
 
         window.clear(sf::Color::Black);
+
+        // Draw the field image with the calculated offset
+        s.setPosition(fieldOffsetX, fieldOffsetY);
+        window.draw(s);
 
         for (int i = 0; i < M; i++)
             for (int j = 0; j < N; j++)
             {
-                if (field[i][j] == 0) continue;
+                if (field[i][j] == 0)
+                    continue;
                 s.setTextureRect(sf::IntRect(field[i][j] * 18, 0, 18, 18));
-                s.setPosition(j * 18, i * 18);
-                s.move(28, 31); //offset
+                s.setPosition(j * 18 + offsetX, i * 18 + offsetY);
                 window.draw(s);
             }
 
         for (int i = 0; i < 4; i++)
         {
             s.setTextureRect(sf::IntRect(colorNum * 18, 0, 18, 18));
-            s.setPosition(a[i].x * 18, a[i].y * 18);
-            s.move(28, 31); //offset
+            s.setPosition(a[i].x * 18 + offsetX, a[i].y * 18 + offsetY);
             window.draw(s);
         }
         window.draw(frame);
