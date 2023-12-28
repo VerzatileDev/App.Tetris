@@ -10,147 +10,160 @@ struct Point { int x, y; } a[4], b[4];
 
 int figures[7][4] =
 {
-	1,3,5,7, // I
-	2,4,5,7, // Z
-	3,5,4,6, // S
-	3,5,4,7, // T
-	2,3,5,7, // L
-	3,5,7,6, // J
-	2,3,4,5, // O
+    1,3,5,7, // I
+    2,4,5,7, // Z
+    3,5,4,6, // S
+    3,5,4,7, // T
+    2,3,5,7, // L
+    3,5,7,6, // J
+    2,3,4,5, // O
 };
 
 bool check()
 {
-	for (int i = 0; i < 4; i++)
-		if (a[i].x < 0 || a[i].x >= N || a[i].y >= M) return 0;
-		else if (field[a[i].y][a[i].x]) return 0;
+    for (int i = 0; i < 4; i++)
+        if (a[i].x < 0 || a[i].x >= N || a[i].y >= M) return false;
+        else if (field[a[i].y][a[i].x]) return false;
 
-	return 1;
+    return true;
 }
-
 
 int main()
 {
-	srand(time(0));
+    srand(static_cast<unsigned>(time(0)));
 
-	sf::RenderWindow window(sf::VideoMode::VideoMode(320, 480), "Tetris");
+    sf::RenderWindow window(sf::VideoMode(320, 480), "Tetris");
 
-	sf::Texture t;
-	t.loadFromFile("Textures/tiles.png");
-	sf::Sprite s(t);
-	s.setTextureRect(sf::IntRect(0, 0, 18, 18));
+    sf::Texture t, t2;
+    if (!t.loadFromFile("Textures/tiles.png") || !t2.loadFromFile("Textures/frame.png")) {
+        // Error loading textures
+        return -1;
+    }
+    sf::Sprite s(t), frame(t2);
+    s.setTextureRect(sf::IntRect(0, 0, 18, 18));
 
-	int dx = 0; bool rotate = 0; int colorNum = 1;
-	float timer = 0, delay = 0.3;
+    int dx = 0;
+    bool rotate = false;
+    int colorNum = 1;
+    float timer = 0, delay = 0.3;
 
-	sf::Clock clock;
+    sf::Clock clock;
 
-	while (window.isOpen())
-	{
-		float time = clock.getElapsedTime().asSeconds();
-		clock.restart();
-		timer += time;
+    // Initial spawn position from the middle top
+    int spawnX = N / 2;
+    int spawnY = 0;
 
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-				window.close();
+    int n = rand() % 7; // Randomize figure index
+    for (int i = 0; i < 4; i++)
+    {
+        a[i].x = figures[n][i] % 2 + spawnX;
+        a[i].y = figures[n][i] / 2 + spawnY;
+    }
 
-			if (event.type == sf::Event::KeyPressed)
-				if (event.key.code == sf::Keyboard::Up) rotate = true;
-				else if (event.key.code == sf::Keyboard::Left) dx = -1;
-				else if (event.key.code == sf::Keyboard::Right) dx = 1;
-		}
+    while (window.isOpen())
+    {
+        float time = clock.restart().asSeconds();
+        timer += time;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) delay = 0.05;
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
 
-		// <- Move -> //
-		for (int i = 0; i < 4; i++)
-		{
-			b[i] = a[i];
-			a[i].x += dx;
-		}
-		if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Up) rotate = true;
+                else if (event.key.code == sf::Keyboard::Left) dx = -1;
+                else if (event.key.code == sf::Keyboard::Right) dx = 1;
+            }
+        }
 
-		// Rotate //
-		if (rotate)
-		{
-			Point p = a[1]; //center of rotation
-			for (int i = 0; i < 4; i++)
-			{
-				int x = a[i].y - p.y;
-				int y = a[i].x - p.x;
-				a[i].x = p.x - x;
-				a[i].y = p.y + y;
-			}
-			if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
-		}
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) delay = 0.05;
+        else delay = 0.3;  // Reset delay if Down key is released
 
-		// Tick //
-		if (timer > delay)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				b[i] = a[i];	
-				a[i].y += 1;
-			}
-			if (!check())
-			{
-				for (int i = 0; i < 4; i++) field[b[i].y][b[i].x] = colorNum;
+        // <- Move -> //
+        for (int i = 0; i < 4; i++)
+        {
+            b[i] = a[i];
+            a[i].x += dx;
+        }
+        if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
 
-				colorNum = 1 + rand() % 7;
-				int n = rand() % 7;
-				for (int i = 0; i < 4; i++)
-				{
-					a[i].x = figures[n][i] % 2;
-					a[i].y = figures[n][i] / 2;
-				}
-			}
-			timer = 0;
-		}
+        // Rotate //
+        if (rotate)
+        {
+            Point p = a[1]; //center of rotation
+            for (int i = 0; i < 4; i++)
+            {
+                int x = a[i].y - p.y;
+                int y = a[i].x - p.x;
+                a[i].x = p.x - x;
+                a[i].y = p.y + y;
+            }
+            if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
+        }
 
-		// check lines //
-		int k = M - 1;
-		for (int i = M - 1; i > 0; i--)
-		{
-			int count = 0;
-			for (int j = 0; j < N; j++)
-			{
-				if (field[i][j]) count++;
-				field[k][j] = field[i][j];
-			}
-			if (count < N) k--;
-		}
+        // Tick //
+        if (timer > delay)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                b[i] = a[i];
+                a[i].y += 1;
+            }
+            if (!check())
+            {
+                for (int i = 0; i < 4; i++) field[b[i].y][b[i].x] = colorNum;
 
-		int n = 3; // or any other figure index you want
-		if (a[0].x == 0)
-		for (int i = 0; i < 4; i++)
-		{
-			a[i].x = figures[n][i] % 2;
-			a[i].y = figures[n][i] / 2;
-		}
+                colorNum = 1 + rand() % 7;
+                n = rand() % 7;
+                for (int i = 0; i < 4; i++)
+                {
+                    a[i].x = figures[n][i] % 2 + spawnX;
+                    a[i].y = figures[n][i] / 2 + spawnY;
+                }
+            }
+            timer = 0;
+        }
 
-		dx = 0; rotate = 0; delay = 0.3;
+        // Check lines //
+        int k = M - 1;
+        for (int i = M - 1; i > 0; i--)
+        {
+            int count = 0;
+            for (int j = 0; j < N; j++)
+            {
+                if (field[i][j]) count++;
+                field[k][j] = field[i][j];
+            }
+            if (count < N) k--;
+        }
 
-		window.clear(sf::Color::Black);
-		for (int i = 0; i < M; i++)
-			for (int j = 0; j < N; j++)
-			{
-				if (field[i][j] == 0) continue;
-				s.setTextureRect(sf::IntRect(field[i][j] * 18, 0, 18, 18));
-				s.setPosition(j * 18, i * 18);
-				window.draw(s);
-			}
+        dx = 0; rotate = false;
 
-		for (int i = 0; i < 4; i++)
-		{
-			s.setTextureRect(sf::IntRect(colorNum * 18, 0, 18, 18));
-			s.setPosition(a[i].x * 18, a[i].y * 18);
-			window.draw(s);
-			
-		}
-		window.display();
-	}
-	return 0;
+        window.clear(sf::Color::Black);
+
+        for (int i = 0; i < M; i++)
+            for (int j = 0; j < N; j++)
+            {
+                if (field[i][j] == 0) continue;
+                s.setTextureRect(sf::IntRect(field[i][j] * 18, 0, 18, 18));
+                s.setPosition(j * 18, i * 18);
+                s.move(28, 31); //offset
+                window.draw(s);
+            }
+
+        for (int i = 0; i < 4; i++)
+        {
+            s.setTextureRect(sf::IntRect(colorNum * 18, 0, 18, 18));
+            s.setPosition(a[i].x * 18, a[i].y * 18);
+            s.move(28, 31); //offset
+            window.draw(s);
+        }
+        window.draw(frame);
+        window.display();
+    }
+
+    return 0;
 }
