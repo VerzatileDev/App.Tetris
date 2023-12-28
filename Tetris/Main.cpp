@@ -155,7 +155,7 @@ int main()
                 for (int i = 0; i < 4; i++)
                     field[b[i].y][b[i].x] = colorNum;
 
-                colorNum = 1 + rand() % 7;
+                colorNum = nextBlock + 1;
                 int n = nextBlock;
                 nextBlock = rand() % 7;
 
