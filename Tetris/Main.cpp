@@ -1,4 +1,5 @@
 #include "SFML/Graphics.hpp"
+#include <SFML/Audio.hpp>
 #include <time.h>
 
 const int M = 20;
@@ -40,6 +41,42 @@ void drawBlock(sf::RenderWindow &window, sf::Sprite &s, int colorNum, int x, int
     window.draw(s);
 }
 
+void gameOver(sf::RenderWindow& window)
+{
+    // Display "Game Over" message
+    sf::Font font;
+    if (!font.loadFromFile("path/to/font.ttf")) // Replace with your font file
+    {
+        // Error loading font
+        return;
+    }
+
+    sf::Text gameOverText("Game Over\nPress Any Key to Restart", font, 24);
+    gameOverText.setFillColor(sf::Color::White);
+    gameOverText.setPosition(window.getSize().x / 2 - 100, window.getSize().y / 2 - 50);
+
+    window.clear(sf::Color::Black);
+    window.draw(gameOverText);
+    window.display();
+
+    // Wait for any key press to restart
+    sf::Event event;
+    while (window.waitEvent(event))
+    {
+        if (event.type == sf::Event::KeyPressed)
+        {
+            // Restart the game
+            return;
+        }
+        if (event.type == sf::Event::Closed)
+        {
+            // If the window is closed, exit the application
+            window.close();
+            return;
+        }
+    }
+}
+
 int main()
 {
     srand(static_cast<unsigned>(time(0)));
@@ -66,7 +103,7 @@ int main()
     int previewOffsetY = 5;
 
     sf::Texture t, t2;
-    if (!t.loadFromFile("Textures/tiles.png") || !t2.loadFromFile("Textures/frame.png"))
+    if (!t.loadFromFile("Assets/Sprites/tiles.png") || !t2.loadFromFile("Assets/Sprites/frame.png"))
     {
         // Error loading textures
         return -1;
@@ -82,6 +119,31 @@ int main()
     sf::Clock clock;
 
     int nextBlock = rand() % 7;
+
+    // AUDIO related
+    sf::SoundBuffer rotateBuffer;
+    if (!rotateBuffer.loadFromFile("Assets/Audio/JDSherbert - Pixel UI SFX Pack - Cursor 1 (Sine).wav"))
+    {
+        // Error loading sound
+        return -1;
+    }
+    sf::SoundBuffer blockPlacementBuffer;
+    if (!blockPlacementBuffer.loadFromFile("Assets/Audio/JDSherbert - Pixel UI SFX Pack - Error 1 (Square).wav"))
+    {
+        // Error loading sound
+        return -1;
+    }
+
+    sf::SoundBuffer lineClearBuffer;
+    if (!lineClearBuffer.loadFromFile("Assets/Audio/JDSherbert - Pixel UI SFX Pack - Error 2 (Sine).wav"))
+    {
+        // Error loading sound
+        return -1;
+    }
+
+    sf::Sound rotateSound(rotateBuffer);
+    sf::Sound blockPlacementSound(blockPlacementBuffer);
+    sf::Sound lineClearSound(lineClearBuffer);
 
     for (int i = 0; i < 4; i++)
     {
@@ -137,6 +199,9 @@ int main()
                 a[i].x = p.x - x;
                 a[i].y = p.y + y;
             }
+
+            rotateSound.play();
+
             if (!check())
                 for (int i = 0; i < 4; i++)
                     a[i] = b[i];
@@ -154,6 +219,8 @@ int main()
             {
                 for (int i = 0; i < 4; i++)
                     field[b[i].y][b[i].x] = colorNum;
+
+                blockPlacementSound.play();
 
                 colorNum = nextBlock + 1;
                 int n = nextBlock;
@@ -181,6 +248,11 @@ int main()
             }
             if (count < N)
                 k--;
+            else
+            {
+                // Play the line-clear sound
+                lineClearSound.play();
+            }
         }
 
         dx = 0;
