@@ -33,6 +33,13 @@ bool check()
     return true;
 }
 
+void drawBlock(sf::RenderWindow &window, sf::Sprite &s, int colorNum, int x, int y, int offsetX, int offsetY)
+{
+    s.setTextureRect(sf::IntRect((colorNum - 1) * 18, 0, 18, 18));
+    s.setPosition(x * 18 + offsetX, y * 18 + offsetY);
+    window.draw(s);
+}
+
 int main()
 {
     srand(static_cast<unsigned>(time(0)));
@@ -54,6 +61,10 @@ int main()
     int fieldOffsetX = (windowWidth - N * 18) / 2;
     int fieldOffsetY = (windowHeight - M * 18) / 2;
 
+    // Center the preview on the window
+    int previewOffsetX = 5;
+    int previewOffsetY = 5;
+
     sf::Texture t, t2;
     if (!t.loadFromFile("Textures/tiles.png") || !t2.loadFromFile("Textures/frame.png"))
     {
@@ -69,6 +80,8 @@ int main()
     float timer = 0, delay = 0.3;
 
     sf::Clock clock;
+
+    int nextBlock = rand() % 7;
 
     for (int i = 0; i < 4; i++)
     {
@@ -143,7 +156,9 @@ int main()
                     field[b[i].y][b[i].x] = colorNum;
 
                 colorNum = 1 + rand() % 7;
-                int n = rand() % 7;
+                int n = nextBlock;
+                nextBlock = rand() % 7;
+
                 for (int i = 0; i < 4; i++)
                 {
                     a[i].x = figures[n][i] % 2 + spawnX;
@@ -173,26 +188,25 @@ int main()
 
         window.clear(sf::Color::Black);
 
-        // Draw the field image with the calculated offset
-        s.setPosition(fieldOffsetX, fieldOffsetY);
-        window.draw(s);
+        // Draw the preview of the next block
+        for (int i = 0; i < 4; i++)
+        {
+            drawBlock(window, s, nextBlock + 1, figures[nextBlock][i] % 2, figures[nextBlock][i] / 2, previewOffsetX, previewOffsetY);
+        }
 
         for (int i = 0; i < M; i++)
             for (int j = 0; j < N; j++)
             {
                 if (field[i][j] == 0)
                     continue;
-                s.setTextureRect(sf::IntRect(field[i][j] * 18, 0, 18, 18));
-                s.setPosition(j * 18 + offsetX, i * 18 + offsetY);
-                window.draw(s);
+                drawBlock(window, s, field[i][j], j, i, offsetX, offsetY);
             }
 
         for (int i = 0; i < 4; i++)
         {
-            s.setTextureRect(sf::IntRect(colorNum * 18, 0, 18, 18));
-            s.setPosition(a[i].x * 18 + offsetX, a[i].y * 18 + offsetY);
-            window.draw(s);
+            drawBlock(window, s, colorNum, a[i].x, a[i].y, offsetX, offsetY);
         }
+
         window.draw(frame);
         window.display();
     }
