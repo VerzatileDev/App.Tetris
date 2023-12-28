@@ -6,6 +6,10 @@ int main()
 
 	while (window.isOpen())
 	{
+		sf::Texture t;
+		t.loadFromFile("Textures/tiles.png");
+		sf::Sprite s(t);
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -16,7 +20,7 @@ int main()
 
 		window.clear(sf::Color::Black);
 
-
+		window.draw(s);
 		window.display();
 	}
 	return 0;
