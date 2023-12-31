@@ -1,4 +1,4 @@
-#include "SFML/Graphics.hpp"
+#include "Graphics/Window.h"
 #include <SFML/Audio.hpp>
 #include <time.h>
 
@@ -34,61 +34,25 @@ bool check()
     return true;
 }
 
-void drawBlock(sf::RenderWindow &window, sf::Sprite &s, int colorNum, int x, int y, int offsetX, int offsetY)
+void drawBlock(sf::Sprite& s, int colorNum, int x, int y, int offsetX, int offsetY)
 {
     s.setTextureRect(sf::IntRect((colorNum - 1) * 18, 0, 18, 18));
     s.setPosition(x * 18 + offsetX, y * 18 + offsetY);
-    window.draw(s);
-}
-
-void gameOver(sf::RenderWindow& window)
-{
-    // Display "Game Over" message
-    sf::Font font;
-    if (!font.loadFromFile("path/to/font.ttf")) // Replace with your font file
-    {
-        // Error loading font
-        return;
-    }
-
-    sf::Text gameOverText("Game Over\nPress Any Key to Restart", font, 24);
-    gameOverText.setFillColor(sf::Color::White);
-    gameOverText.setPosition(window.getSize().x / 2 - 100, window.getSize().y / 2 - 50);
-
-    window.clear(sf::Color::Black);
-    window.draw(gameOverText);
-    window.display();
-
-    // Wait for any key press to restart
-    sf::Event event;
-    while (window.waitEvent(event))
-    {
-        if (event.type == sf::Event::KeyPressed)
-        {
-            // Restart the game
-            return;
-        }
-        if (event.type == sf::Event::Closed)
-        {
-            // If the window is closed, exit the application
-            window.close();
-            return;
-        }
-    }
+    Window::getInstance().getWindow().draw(s);
 }
 
 int main()
 {
     srand(static_cast<unsigned>(time(0)));
 
-    sf::RenderWindow window(sf::VideoMode(320, 480), "Tetris");
+    Window::getInstance().initialize(320, 480, 18, M, N); // Initialize the window Creates the window, if not initialized already
 
     // Calculate initial spawn position based on window size
     int spawnX = N / 2;
     int spawnY = 0;
 
-    int windowWidth = window.getSize().x;
-    int windowHeight = window.getSize().y;
+    int windowWidth = Window::getInstance().getWindow().getSize().x;
+    int windowHeight = Window::getInstance().getWindow().getSize().y;
 
     // Center the game field on the window
     int offsetX = (windowWidth - N * 18) / 2;
@@ -151,16 +115,16 @@ int main()
         a[i].y = figures[0][i] / 2 + spawnY;
     }
 
-    while (window.isOpen())
+    while (Window::getInstance().getWindow().isOpen())
     {
         float time = clock.restart().asSeconds();
         timer += time;
 
         sf::Event event;
-        while (window.pollEvent(event))
+        while (Window::getInstance().getWindow().pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
-                window.close();
+                Window::getInstance().getWindow().close();
 
             if (event.type == sf::Event::KeyPressed)
             {
@@ -258,12 +222,12 @@ int main()
         dx = 0;
         rotate = false;
 
-        window.clear(sf::Color::Black);
+        Window::getInstance().clear();
 
         // Draw the preview of the next block
         for (int i = 0; i < 4; i++)
         {
-            drawBlock(window, s, nextBlock + 1, figures[nextBlock][i] % 2, figures[nextBlock][i] / 2, previewOffsetX, previewOffsetY);
+            drawBlock(s, nextBlock + 1, figures[nextBlock][i] % 2, figures[nextBlock][i] / 2, previewOffsetX, previewOffsetY);
         }
 
         for (int i = 0; i < M; i++)
@@ -271,16 +235,16 @@ int main()
             {
                 if (field[i][j] == 0)
                     continue;
-                drawBlock(window, s, field[i][j], j, i, offsetX, offsetY);
+                drawBlock(s, field[i][j], j, i, offsetX, offsetY);
             }
 
         for (int i = 0; i < 4; i++)
         {
-            drawBlock(window, s, colorNum, a[i].x, a[i].y, offsetX, offsetY);
+            drawBlock(s, colorNum, a[i].x, a[i].y, offsetX, offsetY);
         }
 
-        window.draw(frame);
-        window.display();
+        Window::getInstance().getWindow().draw(frame);
+        Window::getInstance().display();
     }
 
     return 0;
