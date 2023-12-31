@@ -1,6 +1,6 @@
 #include "Graphics/Window.h"
-#include <SFML/Audio.hpp>
 #include <time.h>
+#include "Audio/AudioManager.h"
 
 const int M = 20;
 const int N = 10;
@@ -47,6 +47,8 @@ int main()
 
     Window::getInstance().initialize(320, 480, 18, M, N); // Initialize the window Creates the window, if not initialized already
 
+    AudioManager audioManager;
+
     // Calculate initial spawn position based on window size
     int spawnX = N / 2;
     int spawnY = 0;
@@ -83,31 +85,6 @@ int main()
     sf::Clock clock;
 
     int nextBlock = rand() % 7;
-
-    // AUDIO related
-    sf::SoundBuffer rotateBuffer;
-    if (!rotateBuffer.loadFromFile("Assets/Audio/JDSherbert - Pixel UI SFX Pack - Cursor 1 (Sine).wav"))
-    {
-        // Error loading sound
-        return -1;
-    }
-    sf::SoundBuffer blockPlacementBuffer;
-    if (!blockPlacementBuffer.loadFromFile("Assets/Audio/JDSherbert - Pixel UI SFX Pack - Error 1 (Square).wav"))
-    {
-        // Error loading sound
-        return -1;
-    }
-
-    sf::SoundBuffer lineClearBuffer;
-    if (!lineClearBuffer.loadFromFile("Assets/Audio/JDSherbert - Pixel UI SFX Pack - Error 2 (Sine).wav"))
-    {
-        // Error loading sound
-        return -1;
-    }
-
-    sf::Sound rotateSound(rotateBuffer);
-    sf::Sound blockPlacementSound(blockPlacementBuffer);
-    sf::Sound lineClearSound(lineClearBuffer);
 
     for (int i = 0; i < 4; i++)
     {
@@ -164,7 +141,7 @@ int main()
                 a[i].y = p.y + y;
             }
 
-            rotateSound.play();
+            audioManager.playRotateSound();
 
             if (!check())
                 for (int i = 0; i < 4; i++)
@@ -184,7 +161,7 @@ int main()
                 for (int i = 0; i < 4; i++)
                     field[b[i].y][b[i].x] = colorNum;
 
-                blockPlacementSound.play();
+                audioManager.playBlockPlacementSound();
 
                 colorNum = nextBlock + 1;
                 int n = nextBlock;
@@ -214,8 +191,7 @@ int main()
                 k--;
             else
             {
-                // Play the line-clear sound
-                lineClearSound.play();
+                audioManager.playLineClearSound();
             }
         }
 
