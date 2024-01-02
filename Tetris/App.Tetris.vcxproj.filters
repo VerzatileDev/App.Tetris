@@ -5,36 +5,51 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Game">
-      <UniqueIdentifier>{c46ab26e-105d-42f5-8013-5b18ca31f062}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Graphics">
       <UniqueIdentifier>{5db93b37-9539-4ccb-862a-f4411d75917c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Audio">
       <UniqueIdentifier>{7cf43e44-9ab5-46e9-99d0-c73242d28c08}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources">
-      <UniqueIdentifier>{e3b02c94-8104-4ca2-a351-033b1507a9ba}</UniqueIdentifier>
+    <Filter Include="Handlers">
+      <UniqueIdentifier>{ebd4e05f-08bb-442a-a4ec-b83c18034e5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{69d43b28-7a19-4a47-804f-cfd52fa1c1f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Window.cpp">
+    <ClCompile Include="core\Audio\AudioManager.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="core\Graphics\Window.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Audio\AudioManager.cpp">
-      <Filter>Audio</Filter>
+    <ClCompile Include="core\Handling\Event.cpp">
+      <Filter>Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="core\Handling\EventHandler.cpp">
+      <Filter>Handlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Graphics\Window.h">
+    <ClInclude Include="core\Audio\AudioManager.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Graphics\Window.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Audio\AudioManager.h">
-      <Filter>Audio</Filter>
+    <ClInclude Include="core\Handling\Event.h">
+      <Filter>Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Handling\EventHandler.h">
+      <Filter>Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="core\SubSystem.h">
+      <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

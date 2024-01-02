@@ -1,6 +1,9 @@
-#include "Graphics/Window.h"
+// Project Includes
+#include "core/Graphics/Window.h"
+#include "core/Audio/AudioManager.h"
+
+// System Libraries
 #include <time.h>
-#include "Audio/AudioManager.h"
 
 const int M = 20;
 const int N = 10;
@@ -103,8 +106,7 @@ int main()
             if (event.type == sf::Event::Closed)
                 Window::getInstance().getWindow().close();
 
-            if (event.type == sf::Event::KeyPressed)
-            {
+            if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Up)
                     rotate = true;
                 else if (event.key.code == sf::Keyboard::Left)
