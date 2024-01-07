@@ -28,7 +28,7 @@ void InputSystem::PollEvents() {
         else if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
             auto it = keyCodeMap.find(event.key.code);
             if (it != keyCodeMap.end()) {
-                bool isKeyDown = event.type == sf::Event::KeyPressed;
+                bool isKeyDown = (event.type == sf::Event::KeyPressed);
 
                 if (isKeyDown && !IsKeyDown(event.key.code)) {
                     EventHandler::getInstance().AddEvent(Event(Event::KeyPressed, it->second));
@@ -39,7 +39,7 @@ void InputSystem::PollEvents() {
 
                 UpdateKeyState(event.key.code, isKeyDown);
 
-                if (IsKeyDown(event.key.code)) {
+                if (isKeyDown && !WasKeyDown(event.key.code)) {
                     EventHandler::getInstance().AddEvent(Event(Event::KeyHeldDown, it->second));
                 }
             }
@@ -149,6 +149,7 @@ std::unordered_map<sf::Keyboard::Key, std::string> InputSystem::GenerateKeyCodeM
 }
 
 void InputSystem::UpdateKeyState(sf::Keyboard::Key keyCode, bool isPressed) {
+    prevKeyState.set(static_cast<size_t>(keyCode), keyState.test(static_cast<size_t>(keyCode)));
     keyState.set(static_cast<size_t>(keyCode), isPressed);
 }
 
@@ -156,6 +157,9 @@ bool InputSystem::IsKeyDown(sf::Keyboard::Key keyCode) {
     return keyState.test(static_cast<size_t>(keyCode));
 }
 
+bool InputSystem::WasKeyDown(sf::Keyboard::Key keyCode) {
+    return prevKeyState.test(static_cast<size_t>(keyCode));
+}
 void InputSystem::Cleanup() {
     keyCodeMap.clear();
 }

@@ -7,7 +7,7 @@
 /// Acts as a Base Type of System for other Systems to inherit from.
 /// </para>
 /// <note>
-/// Forceing all Systems to have an initialize and update function.
+/// Forcing all Systems to have an initialize and update function.
 /// </note>
 /// </summary>
 class SubSystem

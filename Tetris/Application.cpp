@@ -4,6 +4,8 @@
 
 // System Libraries
 #include <time.h>
+#include "core/Handling/EventHandler.h"
+#include "core/Inputs/InputSystem.h"
 
 const int M = 20;
 const int N = 10;
@@ -50,7 +52,10 @@ int main()
 
     Window::getInstance().initialize(320, 480, 18, M, N); // Initialize the window Creates the window, if not initialized already
 
+    EventHandler& eventHandler = EventHandler::getInstance();
+    InputSystem inputSystem;
     AudioManager audioManager;
+    inputSystem.Initialize();
 
     // Calculate initial spawn position based on window size
     int spawnX = N / 2;
@@ -81,10 +86,8 @@ int main()
     s.setTextureRect(sf::IntRect(0, 0, 18, 18));
 
     int dx = 0;
-    bool rotate = false;
     int colorNum = 1;
-    float timer = 0, delay = 0.3;
-
+    float timer = 0;
     sf::Clock clock;
 
     int nextBlock = rand() % 7;
@@ -95,31 +98,21 @@ int main()
         a[i].y = figures[0][i] / 2 + spawnY;
     }
 
-    while (Window::getInstance().getWindow().isOpen())
+    while (Window::getInstance().getWindow().isOpen() && eventHandler.IsRunning())
     {
         float time = clock.restart().asSeconds();
         timer += time;
 
-        sf::Event event;
-        while (Window::getInstance().getWindow().pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                Window::getInstance().getWindow().close();
+        inputSystem.Update();
+        // Set DX On EventHandler to this Class or file. 
+        // Set Rotate on EventHandler to this Class or file.
+        // Set Delay on EventHandler to this Class or file.
 
-            if (event.type == sf::Event::KeyPressed) {
-                if (event.key.code == sf::Keyboard::Up)
-                    rotate = true;
-                else if (event.key.code == sf::Keyboard::Left)
-                    dx = -1;
-                else if (event.key.code == sf::Keyboard::Right)
-                    dx = 1;
-            }
-        }
+        // CHANGE THESE TO BE SETTERS FROM THIS CLASS rather than getting from the event handler
+        // Maybe
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            delay = 0.05;
-        else
-            delay = 0.3; // Reset delay if Down key is released
+        // Set DX from EventHandler
+        dx = eventHandler.getDx();
 
         // <- Move -> //
         for (int i = 0; i < 4; i++)
@@ -132,7 +125,7 @@ int main()
                 a[i] = b[i];
 
         // Rotate //
-        if (rotate)
+        if (eventHandler.isRotate())
         {
             Point p = a[1]; // center of rotation
             for (int i = 0; i < 4; i++)
@@ -151,7 +144,7 @@ int main()
         }
 
         // Tick //
-        if (timer > delay)
+        if (timer > eventHandler.getDelay())
         {
             for (int i = 0; i < 4; i++)
             {
@@ -197,8 +190,7 @@ int main()
             }
         }
 
-        dx = 0;
-        rotate = false;
+        eventHandler.getInstance().ProcessEvents();
 
         Window::getInstance().clear();
 

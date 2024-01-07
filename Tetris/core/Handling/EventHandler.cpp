@@ -1,19 +1,13 @@
 #include "EventHandler.h"
 
 EventHandler::EventHandler() : subsystemRef(nullptr) 
-{
-
-}
+{}
 
 EventHandler::EventHandler(SubSystem& subsystem) : subsystemRef(&subsystem) 
-{
-
-}
+{}
 
 EventHandler::~EventHandler()
-{
-
-}
+{}
 
 EventHandler& EventHandler::getInstance() {
     static EventHandler instance;
@@ -28,46 +22,72 @@ void EventHandler::ClearEvents() {
     eventQueue.clear();
 }
 
+bool EventHandler::IsRunning() {
+    return running;
+}
+
 void EventHandler::ProcessEvents() {
     for (Event& event : eventQueue) {
         switch (event.GetType()) {
         case Event::Closed:
             std::cout << "Closing the Engine" << std::endl;
-            //running = false;
+            running = false;
             break;
         case Event::KeyPressed:
             if (event.GetKeyString() == "Escape") {
                 std::cout << "Closing the Engine" << std::endl;
-                //running = false;
+                running = false;
             }
-            else if (event.GetKeyString() == "Space") {
-				//std::cout << "Space is pressed" << std::endl;
-				//player.jump();
+            else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W") {
+                rotate = false;
 			}
-            break;
-        case Event::KeyHeldDown:
-            if (event.GetKeyString() == "A") {
-                //std::cout << "A is held down" << std::endl;   
-                //player.moveLeft();
+            else if (event.GetKeyString() == "A") 
+            {
+                dx = -1;
             }
-            else if (event.GetKeyString() == "D") {
-                //std::cout << "D is held down" << std::endl;
-                //player.moveRight();
-            }
+            else if (event.GetKeyString() == "D")
+            {
+                dx = 1;
 
+            }
+            else if (event.GetKeyString() == "S")
+            {
+                delay = 0.05;
+			}
             break;
         case Event::KeyReleased:
             if (event.GetKeyString() == "A" || event.GetKeyString() == "D") {
-                //player.stopMoving();
+                dx = 0;
             }
-            else if (event.GetKeyString() == "Space") {
-				//canJump = true;
+            else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W") {
+                rotate = true;
+            }
+            else if (event.GetKeyString() == "S") {
+				delay = 0.3;
 			}
             break;
         default:
-            std::cout << "Event not defined with an action " << std::endl;
             break;
         }
     }
     ClearEvents();
+}
+
+float EventHandler::getDelay()
+{
+    return delay;
+}
+
+bool EventHandler::isRotate()
+{
+    bool currentRotate = rotate;  // Store the current state
+    rotate = false;  // Reset rotate to false after reading its state
+    return currentRotate;  // Return the stored state
+}
+
+int EventHandler::getDx()
+{
+    float tempDx = dx;  // Store the current state
+    dx = 0;  // Reset dx to 0 after reading its state
+    return tempDx;
 }

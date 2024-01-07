@@ -17,6 +17,9 @@
     <Filter Include="core">
       <UniqueIdentifier>{69d43b28-7a19-4a47-804f-cfd52fa1c1f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\inputs">
+      <UniqueIdentifier>{6b9d6c41-7d4b-45e5-80a0-37819d5f6e5c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -34,6 +37,9 @@
     <ClCompile Include="core\Handling\EventHandler.cpp">
       <Filter>Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="core\Inputs\InputSystem.cpp">
+      <Filter>core\inputs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\Audio\AudioManager.h">
@@ -50,6 +56,9 @@
     </ClInclude>
     <ClInclude Include="core\SubSystem.h">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Inputs\InputSystem.h">
+      <Filter>core\inputs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
