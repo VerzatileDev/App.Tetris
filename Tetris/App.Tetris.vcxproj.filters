@@ -40,6 +40,9 @@
     <ClCompile Include="core\Inputs\InputSystem.cpp">
       <Filter>core\inputs</Filter>
     </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\Audio\AudioManager.h">
@@ -60,5 +63,6 @@
     <ClInclude Include="core\Inputs\InputSystem.h">
       <Filter>core\inputs</Filter>
     </ClInclude>
+    <ClInclude Include="Engine.h" />
   </ItemGroup>
 </Project>

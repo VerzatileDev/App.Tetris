@@ -148,6 +148,7 @@ ping -n 6 127.0.0.1 &gt; nul
     <ClCompile Include="core\Handling\Event.cpp" />
     <ClCompile Include="core\Handling\EventHandler.cpp" />
     <ClCompile Include="core\Inputs\InputSystem.cpp" />
+    <ClCompile Include="Engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\Audio\AudioManager.h" />
@@ -156,6 +157,7 @@ ping -n 6 127.0.0.1 &gt; nul
     <ClInclude Include="core\Handling\EventHandler.h" />
     <ClInclude Include="core\Inputs\InputSystem.h" />
     <ClInclude Include="core\SubSystem.h" />
+    <ClInclude Include="Engine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
