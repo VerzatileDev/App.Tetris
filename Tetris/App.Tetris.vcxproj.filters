@@ -63,6 +63,8 @@
     <ClInclude Include="core\Inputs\InputSystem.h">
       <Filter>core\inputs</Filter>
     </ClInclude>
-    <ClInclude Include="Engine.h" />
+    <ClInclude Include="Engine.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
