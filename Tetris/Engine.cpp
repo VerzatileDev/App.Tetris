@@ -8,26 +8,26 @@ Engine::~Engine() {}
 void Engine::initialize() {
     srand(static_cast<unsigned>(time(0)));
 
+    // Initialize the window with the same dimensions
     Window::getInstance().initialize(620, 780, 18, M, N);
 
     inputSystem.Initialize();
 
-    if (!texture.loadFromFile("Assets/Sprites/tiles.png") || !frameTexture.loadFromFile("Assets/Sprites/frame.png")) {
+    if (!texture.loadFromFile("Assets/Sprites/tiles.png")) {
         // Error loading textures
         exit(-1);
     }
 
     sprite.setTexture(texture);
     sprite.setTextureRect(sf::IntRect(0, 0, 18, 18));
-    frame.setTexture(frameTexture);
 
     colorNum = 1;
     nextBlock = rand() % 7;
     timer = 0.0f;
 
-    // Initialize the first piece
-    int spawnX = N / 2;
-    int spawnY = 0;
+    // Initialize the first piece at the top-left corner of the field
+    int spawnX = N / 2; // Center horizontally
+    int spawnY = 0;     // Top of the field
     for (int i = 0; i < 4; i++) {
         a[i].x = figures[0][i] % 2 + spawnX;
         a[i].y = figures[0][i] / 2 + spawnY;
@@ -35,27 +35,29 @@ void Engine::initialize() {
 }
 
 void Engine::update() {
+    // Main game loop: runs while the window is open and the event handler is active
     while (Window::getInstance().getWindow().isOpen() && eventHandler.IsRunning()) {
+        // Calculate elapsed time since the last frame
         float time = clock.restart().asSeconds();
         timer += time;
 
+        // Update input system to process user inputs
         inputSystem.Update();
 
-        // Set DX and other controls
+        // Handle horizontal movement (left/right)
         int dx = eventHandler.getDx();
-
-        // Move
         for (int i = 0; i < 4; i++) {
-            b[i] = a[i];
-            a[i].x += dx;
+            b[i] = a[i]; // Backup current block positions
+            a[i].x += dx; // Apply horizontal movement
         }
+        // Revert movement if it results in an invalid state
         if (!check())
             for (int i = 0; i < 4; i++)
                 a[i] = b[i];
 
-        // Rotate
+        // Handle block rotation
         if (eventHandler.isRotate()) {
-            Point p = a[1];
+            Point p = a[1]; // Use the second block as the rotation center
             for (int i = 0; i < 4; i++) {
                 int x = a[i].y - p.y;
                 int y = a[i].x - p.x;
@@ -63,80 +65,102 @@ void Engine::update() {
                 a[i].y = p.y + y;
             }
 
+            // Play rotation sound effect
             audioManager.playRotateSound();
 
+            // Revert rotation if it results in an invalid state
             if (!check())
                 for (int i = 0; i < 4; i++)
                     a[i] = b[i];
         }
 
-        // Tick
+        // Handle block falling (tick)
         if (timer > eventHandler.getDelay()) {
             for (int i = 0; i < 4; i++) {
-                b[i] = a[i];
-                a[i].y += 1;
+                b[i] = a[i]; // Backup current block positions
+                a[i].y += 1; // Move block down
             }
+            // If the block cannot move further down, lock it in place
             if (!check()) {
                 for (int i = 0; i < 4; i++)
-                    field[b[i].y][b[i].x] = colorNum;
+                    field[b[i].y][b[i].x] = colorNum; // Save block to the field
 
+                // Play block placement sound effect
                 audioManager.playBlockPlacementSound();
 
+                // Prepare the next block
                 colorNum = nextBlock + 1;
                 int n = nextBlock;
-                nextBlock = rand() % 7;
+                nextBlock = rand() % 7; // Randomly select the next block
 
+                // Initialize the new block's position
                 for (int i = 0; i < 4; i++) {
                     a[i].x = figures[n][i] % 2 + N / 2;
                     a[i].y = figures[n][i] / 2;
                 }
             }
-            timer = 0;
+            timer = 0; // Reset the timer
         }
 
-        // Check lines
-        int k = M - 1;
+        // Check for and clear completed lines
+        int k = M - 1; // Start from the bottom of the field
         for (int i = M - 1; i > 0; i--) {
             int count = 0;
             for (int j = 0; j < N; j++) {
                 if (field[i][j])
-                    count++;
-                field[k][j] = field[i][j];
+                    count++; // Count filled cells in the row
+                field[k][j] = field[i][j]; // Copy row to the current position
             }
             if (count < N)
-                k--;
+                k--; // Move to the next row if the current row is not full
             else
-                audioManager.playLineClearSound();
+                audioManager.playLineClearSound(); // Play line clear sound effect
         }
 
+        // Process events (e.g., user inputs)
         eventHandler.getInstance().ProcessEvents();
 
+        // Clear the window for the next frame
         Window::getInstance().clear();
 
-        // Draw the preview of the next block
+        // Draw the playable area border
+        sf::RectangleShape playableAreaBorder(sf::Vector2f(N * 18, M * 18));
+        playableAreaBorder.setPosition(18, 18); // Add top and left spacing
+        playableAreaBorder.setFillColor(sf::Color::Transparent);
+        playableAreaBorder.setOutlineColor(sf::Color::White);
+        playableAreaBorder.setOutlineThickness(2);
+        Window::getInstance().getWindow().draw(playableAreaBorder);
+
+        // Draw the preview area border
+        sf::RectangleShape previewAreaBorder(sf::Vector2f(6 * 18, 6 * 18)); // Increased size
+        previewAreaBorder.setPosition(N * 18 + 28, 18); // Position to the right of the field with left spacing
+        previewAreaBorder.setFillColor(sf::Color::Transparent);
+        previewAreaBorder.setOutlineColor(sf::Color::White);
+        previewAreaBorder.setOutlineThickness(2);
+        Window::getInstance().getWindow().draw(previewAreaBorder);
+
+        // Draw the preview of the next block centered within the larger preview area
+        int previewCenterX = N * 18 + 28 + (6 * 18) / 2 - 18; // Center horizontally
+        int previewCenterY = 18 + (6 * 18) / 2 - 18 - 18;     // Center vertically and move 1 block higher
         for (int i = 0; i < 4; i++) {
-            drawBlock(sprite, nextBlock + 1, figures[nextBlock][i] % 2, figures[nextBlock][i] / 2, 5, 5);
+            drawBlock(sprite, nextBlock + 1, figures[nextBlock][i] % 2, figures[nextBlock][i] / 2, previewCenterX, previewCenterY);
         }
 
+        // Draw the game field (placed blocks)
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) {
                 if (field[i][j] == 0)
-                    continue;
-                drawBlock(sprite, field[i][j], j, i, (Window::getInstance().getWindow().getSize().x - N * 18) / 2, (Window::getInstance().getWindow().getSize().y - M * 18) / 2);
+                    continue; // Skip empty cells
+                drawBlock(sprite, field[i][j], j, i, 18, 18); // Add top and left spacing
             }
         }
 
+        // Draw the current falling block
         for (int i = 0; i < 4; i++) {
-            drawBlock(sprite, colorNum, a[i].x, a[i].y, (Window::getInstance().getWindow().getSize().x - N * 18) / 2, (Window::getInstance().getWindow().getSize().y - M * 18) / 2);
+            drawBlock(sprite, colorNum, a[i].x, a[i].y, 18, 18); // Add top and left spacing
         }
 
-        // Center the frame
-        int frameOffsetX = (Window::getInstance().getWindow().getSize().x - frameTexture.getSize().x) / 2;
-        int frameOffsetY = (Window::getInstance().getWindow().getSize().y - frameTexture.getSize().y) / 2;
-        frame.setPosition(frameOffsetX, frameOffsetY);
-
-        // Draw the frame
-        Window::getInstance().getWindow().draw(frame);
+        // Display the updated frame
         Window::getInstance().display();
     }
 }
