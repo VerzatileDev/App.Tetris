@@ -38,33 +38,30 @@ void EventHandler::ProcessEvents() {
                 std::cout << "Closing the Engine" << std::endl;
                 running = false;
             }
-            else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W") {
+            else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W" || event.GetKeyString() == "Up Arrow") {
                 rotate = false;
-			}
-            else if (event.GetKeyString() == "A") 
-            {
+            }
+            else if (event.GetKeyString() == "A" || event.GetKeyString() == "Left Arrow") {
                 dx = -1;
             }
-            else if (event.GetKeyString() == "D")
-            {
+            else if (event.GetKeyString() == "D" || event.GetKeyString() == "Right Arrow") {
                 dx = 1;
-
             }
-            else if (event.GetKeyString() == "S")
-            {
+            else if (event.GetKeyString() == "S" || event.GetKeyString() == "Down Arrow") {
                 delay = 0.05;
-			}
+            }
             break;
         case Event::KeyReleased:
-            if (event.GetKeyString() == "A" || event.GetKeyString() == "D") {
+            if (event.GetKeyString() == "A" || event.GetKeyString() == "D" ||
+                event.GetKeyString() == "Left Arrow" || event.GetKeyString() == "Right Arrow") {
                 dx = 0;
             }
-            else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W") {
+            else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W" || event.GetKeyString() == "Up Arrow") {
                 rotate = true;
             }
-            else if (event.GetKeyString() == "S") {
-				delay = 0.3;
-			}
+            else if (event.GetKeyString() == "S" || event.GetKeyString() == "Down Arrow") {
+                delay = 0.3;
+            }
             break;
         default:
             break;
