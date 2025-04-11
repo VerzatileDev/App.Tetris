@@ -1,4 +1,8 @@
 #include "EventHandler.h"
+#include <unordered_map>
+
+// Add this to the EventHandler class
+std::unordered_map<std::string, bool> keyStates;
 
 EventHandler::EventHandler() : subsystemRef(nullptr) 
 {}
@@ -34,33 +38,40 @@ void EventHandler::ProcessEvents() {
             running = false;
             break;
         case Event::KeyPressed:
-            if (event.GetKeyString() == "Escape") {
-                std::cout << "Closing the Engine" << std::endl;
-                running = false;
-            }
-            else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W" || event.GetKeyString() == "Up Arrow") {
-                rotate = false;
-            }
-            else if (event.GetKeyString() == "A" || event.GetKeyString() == "Left Arrow") {
-                dx = -1;
-            }
-            else if (event.GetKeyString() == "D" || event.GetKeyString() == "Right Arrow") {
-                dx = 1;
-            }
-            else if (event.GetKeyString() == "S" || event.GetKeyString() == "Down Arrow") {
-                delay = 0.05;
+            if (!keyStates[event.GetKeyString()]) {
+                keyStates[event.GetKeyString()] = true;
+
+                if (event.GetKeyString() == "Escape") {
+                    std::cout << "Closing the Engine" << std::endl;
+                    running = false;
+                }
+                else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W" || event.GetKeyString() == "Up Arrow") {
+                    rotate = true; // Trigger rotation
+                }
+                else if (event.GetKeyString() == "A" || event.GetKeyString() == "Left Arrow") {
+                    dx = -1;
+                }
+                else if (event.GetKeyString() == "D" || event.GetKeyString() == "Right Arrow") {
+                    dx = 1;
+                }
+                else if (event.GetKeyString() == "S" || event.GetKeyString() == "Down Arrow") {
+                    delay = 0.05;
+                }
             }
             break;
         case Event::KeyReleased:
-            if (event.GetKeyString() == "A" || event.GetKeyString() == "D" ||
-                event.GetKeyString() == "Left Arrow" || event.GetKeyString() == "Right Arrow") {
-                dx = 0;
-            }
-            else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W" || event.GetKeyString() == "Up Arrow") {
-                rotate = true;
-            }
-            else if (event.GetKeyString() == "S" || event.GetKeyString() == "Down Arrow") {
-                delay = 0.3;
+            if (keyStates[event.GetKeyString()]) {
+                keyStates[event.GetKeyString()] = false;
+
+                if (event.GetKeyString() == "A" || event.GetKeyString() == "D" ||
+                    event.GetKeyString() == "Left Arrow" || event.GetKeyString() == "Right Arrow") {
+                    dx = 0;
+                }
+                else if (event.GetKeyString() == "Space" || event.GetKeyString() == "W" || event.GetKeyString() == "Up Arrow") {
+                }
+                else if (event.GetKeyString() == "S" || event.GetKeyString() == "Down Arrow") {
+                    delay = 0.3;
+                }
             }
             break;
         default:
