@@ -83,7 +83,7 @@ void Engine::update() {
             }
             if (!check()) {
                 for (int i = 0; i < 4; i++)
-                    field[b[i].y][b[i].x] = colorNum;
+                    field[b[i].y][b[i].x] = colorNum; // Lock the block into place
 
                 audioManager.playBlockPlacementSound();
 
@@ -108,37 +108,29 @@ void Engine::update() {
 
                     // Reset the score
                     score = 0;
-
-                    // Prepare the next block
-                    colorNum = nextBlock + 1;
-                    n = nextBlock;
-                    nextBlock = rand() % 7;
-
-                    for (int i = 0; i < 4; i++) {
-                        a[i].x = figures[n][i] % 2 + N / 2;
-                        a[i].y = figures[n][i] / 2;
-                    }
                 }
             }
             timer = 0;
         }
 
         // Check for and clear completed lines
-        int k = M - 1;
-        for (int i = M - 1; i > 0; i--) {
+        int tempField[M][N] = { 0 }; // Temporary array to store the updated field state
+        int k = M - 1; // Start from the bottom of the field
+
+        for (int i = M - 1; i >= 0; i--) {
             int count = 0;
             for (int j = 0; j < N; j++) {
                 if (field[i][j])
                     count++;
-                field[k][j] = field[i][j];
+                tempField[k][j] = field[i][j]; // Copy the row to the temporary array
             }
             if (count < N)
-                k--;
+                k--; // Move to the next row if the current row is not full
             else {
                 audioManager.playLineClearSound();
                 score++; // Increment score when a line is cleared
 
-                // Check for win condition immediately
+                // Check for win condition
                 if (score >= 10) {
                     // Reset the score
                     score = 0;
@@ -162,6 +154,13 @@ void Engine::update() {
 
                     // Continue the game without exiting the update function
                 }
+            }
+        }
+
+        // Copy the updated field state back to the original field array
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                field[i][j] = tempField[i][j];
             }
         }
 
