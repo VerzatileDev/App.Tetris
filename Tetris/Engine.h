@@ -37,6 +37,8 @@ private:
         2, 3, 4, 5  // O
     };
 
+    int score;
+
     int colorNum;
     int nextBlock;
     float timer;

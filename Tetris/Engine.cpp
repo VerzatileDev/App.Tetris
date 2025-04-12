@@ -15,7 +15,8 @@ void Engine::initialize() {
 
     if (!texture.loadFromFile("Assets/Sprites/tiles.png")) {
         // Error loading textures
-        exit(-1);
+        std::cerr << "Error: Failed to load texture 'Assets/Sprites/tiles.png'." << std::endl;
+        return; // Exit gracefully instead of terminating
     }
 
     sprite.setTexture(texture);
@@ -24,6 +25,7 @@ void Engine::initialize() {
     colorNum = 1;
     nextBlock = rand() % 7;
     timer = 0.0f;
+    score = 0;
 
     // Initialize the first piece at the top-left corner of the field
     int spawnX = N / 2; // Center horizontally
@@ -32,135 +34,191 @@ void Engine::initialize() {
         a[i].x = figures[0][i] % 2 + spawnX;
         a[i].y = figures[0][i] / 2 + spawnY;
     }
+
+    // Clear the field
+    for (int i = 0; i < M; i++) {
+        for (int j = 0; j < N; j++) {
+            field[i][j] = 0;
+        }
+    }
 }
 
 void Engine::update() {
-    // Main game loop: runs while the window is open and the event handler is active
     while (Window::getInstance().getWindow().isOpen() && eventHandler.IsRunning()) {
-        // Calculate elapsed time since the last frame
         float time = clock.restart().asSeconds();
         timer += time;
 
-        // Update input system to process user inputs
         inputSystem.Update();
 
-        // Handle horizontal movement (left/right)
+        // Handle horizontal movement
         int dx = eventHandler.getDx();
         for (int i = 0; i < 4; i++) {
-            b[i] = a[i]; // Backup current block positions
-            a[i].x += dx; // Apply horizontal movement
+            b[i] = a[i];
+            a[i].x += dx;
         }
-        // Revert movement if it results in an invalid state
         if (!check())
             for (int i = 0; i < 4; i++)
                 a[i] = b[i];
 
-        // Handle block rotation
+        // Handle rotation
         if (eventHandler.isRotate()) {
-            Point p = a[1]; // Use the second block as the rotation center
+            Point p = a[1];
             for (int i = 0; i < 4; i++) {
                 int x = a[i].y - p.y;
                 int y = a[i].x - p.x;
                 a[i].x = p.x - x;
                 a[i].y = p.y + y;
             }
-
-            // Play rotation sound effect
             audioManager.playRotateSound();
-
-            // Revert rotation if it results in an invalid state
             if (!check())
                 for (int i = 0; i < 4; i++)
                     a[i] = b[i];
         }
 
-        // Handle block falling (tick)
+        // Handle block falling
         if (timer > eventHandler.getDelay()) {
             for (int i = 0; i < 4; i++) {
-                b[i] = a[i]; // Backup current block positions
-                a[i].y += 1; // Move block down
+                b[i] = a[i];
+                a[i].y += 1;
             }
-            // If the block cannot move further down, lock it in place
             if (!check()) {
                 for (int i = 0; i < 4; i++)
-                    field[b[i].y][b[i].x] = colorNum; // Save block to the field
+                    field[b[i].y][b[i].x] = colorNum;
 
-                // Play block placement sound effect
                 audioManager.playBlockPlacementSound();
 
                 // Prepare the next block
                 colorNum = nextBlock + 1;
                 int n = nextBlock;
-                nextBlock = rand() % 7; // Randomly select the next block
+                nextBlock = rand() % 7;
 
-                // Initialize the new block's position
                 for (int i = 0; i < 4; i++) {
                     a[i].x = figures[n][i] % 2 + N / 2;
                     a[i].y = figures[n][i] / 2;
                 }
+
+                // Check for game over (new block overlaps existing blocks)
+                if (!check()) {
+                    // Clear the field
+                    for (int i = 0; i < M; i++) {
+                        for (int j = 0; j < N; j++) {
+                            field[i][j] = 0; // Reset all cells to 0
+                        }
+                    }
+
+                    // Reset the score
+                    score = 0;
+
+                    // Prepare the next block
+                    colorNum = nextBlock + 1;
+                    n = nextBlock;
+                    nextBlock = rand() % 7;
+
+                    for (int i = 0; i < 4; i++) {
+                        a[i].x = figures[n][i] % 2 + N / 2;
+                        a[i].y = figures[n][i] / 2;
+                    }
+                }
             }
-            timer = 0; // Reset the timer
+            timer = 0;
         }
 
         // Check for and clear completed lines
-        int k = M - 1; // Start from the bottom of the field
+        int k = M - 1;
         for (int i = M - 1; i > 0; i--) {
             int count = 0;
             for (int j = 0; j < N; j++) {
                 if (field[i][j])
-                    count++; // Count filled cells in the row
-                field[k][j] = field[i][j]; // Copy row to the current position
+                    count++;
+                field[k][j] = field[i][j];
             }
             if (count < N)
-                k--; // Move to the next row if the current row is not full
-            else
-                audioManager.playLineClearSound(); // Play line clear sound effect
+                k--;
+            else {
+                audioManager.playLineClearSound();
+                score++; // Increment score when a line is cleared
+
+                // Check for win condition immediately
+                if (score >= 10) {
+                    // Reset the score
+                    score = 0;
+
+                    // Clear the field
+                    for (int i = 0; i < M; i++) {
+                        for (int j = 0; j < N; j++) {
+                            field[i][j] = 0; // Reset all cells to 0
+                        }
+                    }
+
+                    // Prepare the next block
+                    colorNum = nextBlock + 1;
+                    int n = nextBlock;
+                    nextBlock = rand() % 7;
+
+                    for (int i = 0; i < 4; i++) {
+                        a[i].x = figures[n][i] % 2 + N / 2;
+                        a[i].y = figures[n][i] / 2;
+                    }
+
+                    // Continue the game without exiting the update function
+                }
+            }
         }
 
-        // Process events (e.g., user inputs)
         eventHandler.getInstance().ProcessEvents();
 
-        // Clear the window for the next frame
         Window::getInstance().clear();
 
         // Draw the playable area border
         sf::RectangleShape playableAreaBorder(sf::Vector2f(N * 18, M * 18));
-        playableAreaBorder.setPosition(18, 18); // Add top and left spacing
+        playableAreaBorder.setPosition(18, 18);
         playableAreaBorder.setFillColor(sf::Color::Transparent);
         playableAreaBorder.setOutlineColor(sf::Color::White);
         playableAreaBorder.setOutlineThickness(2);
         Window::getInstance().getWindow().draw(playableAreaBorder);
 
         // Draw the preview area border
-        sf::RectangleShape previewAreaBorder(sf::Vector2f(6 * 18, 6 * 18)); // Increased size
-        previewAreaBorder.setPosition(N * 18 + 28, 18); // Position to the right of the field with left spacing
+        sf::RectangleShape previewAreaBorder(sf::Vector2f(6 * 18, 6 * 18));
+        previewAreaBorder.setPosition(N * 18 + 28, 18);
         previewAreaBorder.setFillColor(sf::Color::Transparent);
         previewAreaBorder.setOutlineColor(sf::Color::White);
         previewAreaBorder.setOutlineThickness(2);
         Window::getInstance().getWindow().draw(previewAreaBorder);
 
-        // Draw the preview of the next block centered within the larger preview area
-        int previewCenterX = N * 18 + 28 + (6 * 18) / 2 - 18; // Center horizontally
-        int previewCenterY = 18 + (6 * 18) / 2 - 18 - 18;     // Center vertically and move 1 block higher
+        // Draw the preview of the next block
+        int previewCenterX = N * 18 + 28 + (6 * 18) / 2 - 18;
+        int previewCenterY = 18 + (6 * 18) / 2 - 18 - 18;
         for (int i = 0; i < 4; i++) {
             drawBlock(sprite, nextBlock + 1, figures[nextBlock][i] % 2, figures[nextBlock][i] / 2, previewCenterX, previewCenterY);
         }
 
-        // Draw the game field (placed blocks)
+        // Draw the score under the preview area
+        sf::Text scoreText;
+        sf::Font font;
+        if (!font.loadFromFile("Assets/Fonts/arial.ttf")) {
+            exit(-1); // Error loading font
+        }
+        scoreText.setFont(font);
+        scoreText.setString("Score: " + std::to_string(score));
+        scoreText.setCharacterSize(18);
+        scoreText.setFillColor(sf::Color::White);
+        scoreText.setPosition(N * 18 + 28, 18 + 6 * 18 + 10); // Position under the preview area
+        Window::getInstance().getWindow().draw(scoreText);
+
+        // Draw the game field
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) {
                 if (field[i][j] == 0)
-                    continue; // Skip empty cells
-                drawBlock(sprite, field[i][j], j, i, 18, 18); // Add top and left spacing
+                    continue;
+                drawBlock(sprite, field[i][j], j, i, 18, 18);
             }
         }
 
         // Draw the current falling block
         for (int i = 0; i < 4; i++) {
-            drawBlock(sprite, colorNum, a[i].x, a[i].y, 18, 18); // Add top and left spacing
+            drawBlock(sprite, colorNum, a[i].x, a[i].y, 18, 18);
         }
 
-        // Display the updated frame
         Window::getInstance().display();
     }
 }
