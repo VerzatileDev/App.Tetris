@@ -9,7 +9,7 @@ void Engine::initialize() {
     srand(static_cast<unsigned>(time(0)));
 
     // Initialize the window with the same dimensions
-    Window::getInstance().initialize(620, 780, 18, M, N);
+    Window::getInstance().initialize(420, 480, 18, M, N);
 
     inputSystem.Initialize();
 
