@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{2e681222-e082-41dc-83a2-e7084575b483}</ProjectGuid>
-    <RootNamespace>AppTetris</RootNamespace>
+    <RootNamespace>AppVerzaTiles</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -72,12 +72,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ReferencePath>$(ProjectDir)DLLs;$(ReferencePath)</ReferencePath>
-    <OutDir>$(SolutionDir)APP.Tetris\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)APP.Tetris\$(Configuration)\Intermediate\</IntDir>
+    <OutDir>$(SolutionDir)APP.VerzaTiles\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)APP.VerzaTiles\$(Configuration)\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)APP.Tetris\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)APP.Tetris\$(Configuration)\Intermediate\</IntDir>
+    <OutDir>$(SolutionDir)APP.VerzaTiles\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)APP.VerzaTiles\$(Configuration)\Intermediate\</IntDir>
     <ReferencePath>$(ProjectDir)DLLs;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -180,7 +180,7 @@ ping -n 6 127.0.0.1 &gt; nul
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="App.Tetris.rc" />
+    <ResourceCompile Include="App.VerzaTiles.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

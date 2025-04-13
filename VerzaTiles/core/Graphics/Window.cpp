@@ -1,7 +1,7 @@
 #include "Window.h"
 #include <iostream>
 
-Window::Window() : window(sf::VideoMode(320, 480), "TETRIS"), windowSize(320, 480) {}
+Window::Window() : window(sf::VideoMode(320, 480), "VerzaTiles"), windowSize(320, 480) {}
 
 Window::~Window() {
     if (window.isOpen()) {
@@ -16,7 +16,7 @@ Window& Window::getInstance() {
 
 void Window::initialize(int width, int height, int tileSize, int rows, int columns) {
 
-    window.create(sf::VideoMode(width, height), "TETRIS", sf::Style::Titlebar | sf::Style::Close);
+    window.create(sf::VideoMode(width, height), "VerzaTiles", sf::Style::Titlebar | sf::Style::Close);
     windowSize.x = width;
     windowSize.y = height;
 
@@ -28,7 +28,7 @@ void Window::initialize(int width, int height, int tileSize, int rows, int colum
     offsetY = (height - rows * tileSize) / 2;
     
     // Set window Icon
-    setIcon("Assets/Icons/VerzaTetrisWindow.png");
+    setIcon("Assets/Icons/VerzaTilesWindow.png");
 }
 
 void Window::clear() {
