@@ -1,7 +1,7 @@
 #include "Engine.h"
 #include <ctime>
 
-Engine::Engine() : eventHandler(EventHandler::getInstance()) {}
+Engine::Engine() : eventHandler(EventHandler::getInstance()), enableWinCondition(true) {}
 
 Engine::~Engine() {}
 
@@ -41,6 +41,11 @@ void Engine::initialize() {
             field[i][j] = 0;
         }
     }
+}
+
+void Engine::setWinConditionEnabled(bool enabled)
+{
+	enableWinCondition = enabled;
 }
 
 void Engine::update() {
@@ -133,7 +138,7 @@ void Engine::update() {
         }
 
         // Check for win condition BEFORE copying tempField back to field
-        if (score >= 10) {
+        if (enableWinCondition && score >= 10) {
             // Reset the score
             score = 0;
 

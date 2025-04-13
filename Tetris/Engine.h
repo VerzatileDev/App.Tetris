@@ -13,9 +13,11 @@ public:
     ~Engine();
 
     void initialize();
+    void setWinConditionEnabled(bool enabled);
     void update();
 
 private:
+    bool enableWinCondition; 
     void drawBlock(sf::Sprite& s, int colorNum, int x, int y, int offsetX, int offsetY);
     bool check();
 
