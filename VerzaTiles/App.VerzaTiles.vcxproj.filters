@@ -69,6 +69,6 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="App.Tetris.rc" />
+    <ResourceCompile Include="App.VerzaTiles.rc" />
   </ItemGroup>
 </Project>

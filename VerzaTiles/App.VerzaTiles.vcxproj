@@ -124,7 +124,7 @@
       <AdditionalDependencies>sfml-system-d.lib;sfml-graphics-d.lib;sfml-window-d.lib;sfml-audio-d.lib;sfml-network-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreLinkEvent>
-      <Command>copy "$(ProjectDir)DLLs\Debug\*.dll" "$(TargetDir)"
+      <Command>copy "$(ProjectDir)DLLs\DebugD\*.dll" "$(TargetDir)"
 ping -n 6 127.0.0.1 &gt; nul
 </Command>
     </PreLinkEvent>
@@ -155,7 +155,7 @@ ping -n 6 127.0.0.1 &gt; nul
       <Command>xcopy "$(ProjectDir)Assets" "$(TargetDir)Assets\" /s /i /y</Command>
     </PreBuildEvent>
     <PreLinkEvent>
-      <Command>copy "$(ProjectDir)DLLs\Release\*.dll" "$(TargetDir)"
+      <Command>copy "$(ProjectDir)DLLs\ReleaseD\*.dll" "$(TargetDir)"
 ping -n 6 127.0.0.1 &gt; nul
 </Command>
     </PreLinkEvent>
