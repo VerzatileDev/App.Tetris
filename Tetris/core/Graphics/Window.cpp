@@ -16,7 +16,7 @@ Window& Window::getInstance() {
 
 void Window::initialize(int width, int height, int tileSize, int rows, int columns) {
 
-    window.create(sf::VideoMode(width, height), "TETRIS");
+    window.create(sf::VideoMode(width, height), "TETRIS", sf::Style::Titlebar | sf::Style::Close);
     windowSize.x = width;
     windowSize.y = height;
 
