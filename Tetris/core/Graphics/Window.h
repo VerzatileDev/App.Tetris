@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Image.hpp>
 
 class Window {
 public:
@@ -13,6 +14,8 @@ public:
 
     void setFullscreen(bool fullscreen);
     void setWindowSize(sf::Vector2u size);
+
+    void setIcon(const std::string& iconPath);
 
 private:
     Window();
